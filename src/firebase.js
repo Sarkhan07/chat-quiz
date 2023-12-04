@@ -1,6 +1,8 @@
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { getFirestore } from 'firebase/firestore';
 import { initializeApp } from "firebase/app";
+import { loginSuccess, logoutSuccess } from './actions';
+import store from './store';
 
 const firebaseConfig = {
   apiKey: "AIzaSyDNWsVEdUdcQ1AUJJpUvPpV2ykGiOPx1_A",
@@ -17,28 +19,20 @@ const provider = new GoogleAuthProvider();
 const db = getFirestore(app);
 
 export { auth, db };
-
 export const signInWithGoogle = async () => {
   try {
     const result = await signInWithPopup(auth, provider);
-    const credential = GoogleAuthProvider.credentialFromResult(result);
-    const token = credential.accessToken;
     const user = result.user;
-    console.log(credential, 'cred', token, 'tok', 'user', user);
+    store.dispatch(loginSuccess(user));
   } catch (error) {
-    const errorCode = error.code;
-    const errorMessage = error.message;
-    const email = error.customData ? error.customData.email : null;
-    const credential = GoogleAuthProvider.credentialFromError(error);
-    console.log(errorCode, 'errorcode1', errorMessage, 'message2', email, 'email3', credential, 'credential4');
+    console.error(error);
   }
 };
 
 export const signOut = async () => {
   try {
-    console.log('Before sign-out:', auth.currentUser);
     await auth.signOut();
-    console.log('After sign-out:', auth.currentUser);
+    store.dispatch(logoutSuccess());
   } catch (error) {
     console.error(error);
   }

@@ -1,20 +1,26 @@
-import  React, { useEffect, useState } from 'react';
+import  React, { useEffect} from 'react';
 import { signInWithGoogle, auth } from '../firebase';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { LOGIN_SUCCESS } from '../actions.js';
 
 const AuthorizationPage = () => {
-  const [user, setUser] = useState(null);
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user);
   const navigate = useNavigate();
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
-      setUser(user);
+      if (user) {
+        dispatch({ type: LOGIN_SUCCESS, payload: user });
+        navigate('/main');
+      }
     });
 
     return () => {
-      unsubscribe(); 
+      unsubscribe();
     };
-  }, []);
+  }, [dispatch, navigate]);
 
   const handleSignIn = async () => {
     try {
@@ -28,9 +34,8 @@ const AuthorizationPage = () => {
   return (
     <div>
       <h2>Authorization Page</h2>
-      {auth.currentUser ? (
-        navigate('/main')
-       
+      {user ? (
+        <p>Welcome, {user.displayName}!</p>
       ) : (
         <div>
           <p>Please sign in:</p>
