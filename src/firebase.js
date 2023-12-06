@@ -1,5 +1,5 @@
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
-import { getFirestore } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, query, orderBy, onSnapshot } from 'firebase/firestore';
 import { initializeApp } from "firebase/app";
 import { loginSuccess, logoutSuccess } from './actions';
 import store from './store';
@@ -19,6 +19,7 @@ const provider = new GoogleAuthProvider();
 const db = getFirestore(app);
 
 export { auth, db };
+
 export const signInWithGoogle = async () => {
   try {
     const result = await signInWithPopup(auth, provider);
@@ -36,4 +37,24 @@ export const signOut = async () => {
   } catch (error) {
     console.error(error);
   }
+};
+
+export const sendMessageToFirestore = async (text, user) => {
+  try {
+    await addDoc(collection(db, 'messages'), {
+      text,
+      user,
+      timestamp: new Date(),
+    });
+  } catch (error) {
+    console.error('Error sending message:', error);
+  }
+};
+
+export const listenToMessagesFromFirestore = (callback) => {
+  const q = query(collection(db, 'messages'), orderBy('timestamp'));
+  return onSnapshot(q, (snapshot) => {
+    const messages = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    callback(messages);
+  });
 };

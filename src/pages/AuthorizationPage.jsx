@@ -77,7 +77,7 @@ const AuthorizationPage = () => {
   return (
     <AuthContainer>
       <AuthContent>
-      <AuthHeading>Sign in with google for participation in lottery</AuthHeading>
+      <AuthHeading>Sign in with google for participation in Chat-Quiz</AuthHeading>
         {user ? (
           <p>Welcome, {user.displayName}!</p>
         ) : (
