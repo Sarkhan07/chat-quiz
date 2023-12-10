@@ -6,6 +6,7 @@ import MainPage from './pages/MainPage';
 import AuthorizationPage from './pages/AuthorizationPage';
 import { Provider } from 'react-redux';
 import store from './store.js'
+import QuizPage from './pages/QuizPage.jsx';
 
 const App = () => {
   return (
@@ -19,6 +20,7 @@ const App = () => {
               <MainLayout>
                 <Routes>
                   <Route path="/main" element={<MainPage />} />
+                  <Route path="/quiz" element={<QuizPage />} />
                 </Routes>
               </MainLayout>
             }
