@@ -1,5 +1,5 @@
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
-import { getFirestore, collection, addDoc, query, orderBy, onSnapshot } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, updateDoc, doc, getDoc } from 'firebase/firestore';
 import { initializeApp } from "firebase/app";
 import { loginSuccess, logoutSuccess } from './actions';
 import store from './store';
@@ -57,4 +57,29 @@ export const listenToMessagesFromFirestore = (callback) => {
     const messages = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
     callback(messages);
   });
+};
+
+export const setUserReadiness = async (userId, isReady) => {
+  try {
+    const userRef = doc(db, 'users', userId);
+    await updateDoc(userRef, { userReadiness: isReady });
+  } catch (error) {
+    console.error('Error updating user readiness:', error);
+  }
+};
+
+export const getUserReadiness = async (userId) => {
+  try {
+    const userRef = doc(db, 'users', userId);
+    const userSnap = await getDoc(userRef);
+
+    if (userSnap.exists()) {
+      return userSnap.data().userReadiness || false;
+    }
+
+    return false;
+  } catch (error) {
+    console.error('Error getting user readiness:', error);
+    return false;
+  }
 };

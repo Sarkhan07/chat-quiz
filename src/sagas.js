@@ -1,6 +1,6 @@
-import { takeLatest, put, call, delay } from 'redux-saga/effects';
-import { LOGIN_SUCCESS, LOGOUT_SUCCESS } from './actions';
-import { signOut } from './firebase';
+import { takeLatest, put, call, delay, select } from 'redux-saga/effects';
+import { LOGIN_SUCCESS, LOGOUT_SUCCESS, SET_USER_READINESS, UNSET_USER_READINESS } from './actions';
+import { signOut, setUserReadiness as setFirebaseUserReadiness } from './firebase';
 
 function loginSuccessSaga(action) {
   console.log('User logged in:', action.payload);
@@ -20,8 +20,33 @@ function* asyncLogoutSaga() {
   }
 }
 
+function* setUserReadinessSaga(action) {
+  try {
+    const userId = yield select((state) => state.user?.uid);
+    if (userId) {
+      yield call(setFirebaseUserReadiness, userId, action.payload);
+    }
+  } catch (error) {
+    console.error('Error setting user readiness:', error);
+  }
+}
+
+function* unsetUserReadinessSaga() {
+  try {
+    const userId = yield select((state) => state.user?.uid);
+    if (userId) {
+      yield call(setFirebaseUserReadiness, userId, false);
+    }
+  } catch (error) {
+    console.error('Error unsetting user readiness:', error);
+  }
+}
+
+
 export default function* rootSaga() {
   yield takeLatest(LOGIN_SUCCESS, loginSuccessSaga);
   yield takeLatest(LOGOUT_SUCCESS, logoutSuccessSaga);
   yield takeLatest('LOGOUT_ASYNC', asyncLogoutSaga);
+  yield takeLatest(SET_USER_READINESS, setUserReadinessSaga);
+  yield takeLatest(UNSET_USER_READINESS, unsetUserReadinessSaga);
 }

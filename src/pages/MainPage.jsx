@@ -5,8 +5,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { LOGOUT_SUCCESS } from '../actions';
 import { useNavigate } from "react-router-dom";
 import { Input, Button, Typography } from 'antd';
+import ReadyForQuiz from './ReadyForQuiz'
 
-const { Title, Paragraph } = Typography;
+const { Title } = Typography;
 
 const Container = styled.div`
   max-width: 1200px;
@@ -139,7 +140,7 @@ const MainPage = () => {
 
       <QuizSection>
         <Title level={3} style={{ color: '#ffffff' }}>Quiz</Title>
-        <Paragraph style={{ color: '#ffffff' }}>Quiz </Paragraph>
+         <ReadyForQuiz/>
       </QuizSection>
     </Container>
   );
