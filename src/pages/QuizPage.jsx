@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Typography, Button, Radio, Modal } from 'antd';
+import { Typography, Button, Radio} from 'antd';
 import { useNavigate } from 'react-router-dom';
 
 const { Title } = Typography;
@@ -9,8 +9,7 @@ const QuizPage = () => {
   let incorrectCount = 0;
   const navigate = useNavigate();
   const [selectedAnswers, setSelectedAnswers] = useState({});
-  const [resultModalVisible, setResultModalVisible] = useState(false);
-  const [quizResults, setQuizResults] = useState({ correctCount: 0, incorrectCount: 0 }); 
+  let [quizResults, setQuizResults] = useState({ correctCount: 0, incorrectCount: 0 }); 
   const quizData = [
     {
       question: "Which of the following is an example of personal protective equipment (PPE)?",
@@ -61,13 +60,11 @@ const QuizPage = () => {
 
 
   const handleFinishQuiz = () => {
-   
-
     quizData.forEach((questionData, questionIndex) => {
-  
       const selectedOptionIndex = selectedAnswers[questionIndex];
       const isCorrect =
         selectedOptionIndex !== undefined && questionData.options[selectedOptionIndex].isCorrect;
+
       if (isCorrect) {
         return correctCount += 1;
       } else {
@@ -76,9 +73,9 @@ const QuizPage = () => {
       
     });
 
-
-    setQuizResults({ correctCount, incorrectCount });
-    setResultModalVisible(true);
+    quizResults = { correctCount, incorrectCount };
+    setQuizResults(quizResults);
+    navigate('/results', { state: { quizResults } });
   };
 
   const backToMainPage = () => {
@@ -89,11 +86,6 @@ const QuizPage = () => {
     const updatedSelectedAnswers = { ...selectedAnswers };
     updatedSelectedAnswers[questionIndex] = optionIndex;
     setSelectedAnswers(updatedSelectedAnswers);
-  };
-
-  const handleModalClose = () => {
-    setResultModalVisible(false);
-    navigate('/main');
   };
 
   return (
@@ -109,10 +101,12 @@ const QuizPage = () => {
               style={{
                 backgroundColor:
                   selectedAnswers[questionIndex] === optionIndex
-                    ? option.isCorrect
-                      ? 'green'
-                      : 'red'
-                    : 'white',
+                    ? 'blue'
+                      : 'white',
+                      color:
+                  selectedAnswers[questionIndex] === optionIndex
+                    ? 'white'
+                      : 'black',
               }}
               onClick={() => handleAnswerClick(questionIndex, optionIndex)}
             >
@@ -122,22 +116,13 @@ const QuizPage = () => {
         </div>
       ))}
 
-      <Button type="dashed" onClick={handleFinishQuiz} style={{backgroundColor: 'green', color: 'white', margin: '30px'}} >
+      <Button type="dashed" onClick={handleFinishQuiz} style={{ backgroundColor: 'green', color: 'white', margin: '30px' }}>
         Finish Quiz
       </Button>
 
       <Button type="primary" onClick={backToMainPage}>
-        Back to Chat page
+      Back to Chat page
       </Button>
-      <Modal
-      title="Quiz Results"
-      open={resultModalVisible}
-      onCancel={handleModalClose}
-      onOk={handleModalClose}
-    >
-    <p>{`Correct: ${quizResults.correctCount}`}</p>
-    <p>{`Incorrect: ${quizResults.incorrectCount}`}</p>
-    </Modal>
     </div>
   );
 };
